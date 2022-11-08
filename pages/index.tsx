@@ -19,7 +19,7 @@ export default function Home() {
 
   // If you attempt to reassign a variable to a value that is not the type it was born with TS throws an error
   // Ex:
-  // num = '6'
+  num = '6'
 
   // When assigning primitive values to const variables, the variable is born with a literal type, which is a more specific type.
   // Variables with literal types are type checked by type and value. Because const variables are not allowed to be reassigned 
@@ -99,7 +99,9 @@ export default function Home() {
 
   printCar({make: 'Audi', model: 'R8', year: 2012})
 
-  // In some instances you may want to add optional properties to your object types, that are not required. These are denoted with a ? 
+  // In some instances you may want to add optional properties to your object types, that are not required. These are denoted with a ?. The type for an optional property
+  // will be the type defined in the annoation OR undefined. Setting the type annotation with | undefined will not work though, because then the object would always be 
+  // undefined explicitly as a value if the property isnt present. 
 
   function printCar2(car:{
     make: string
@@ -107,15 +109,58 @@ export default function Home() {
     year: number
     chargeVoltage?: number
   }) {
-      if(car.chargeVoltage){
+      // typeguards are utilized for functions that take in objects with optional properties, in order to direct control flow based on which properties are present in 
+      // the objects passed to the function, one kind of typeguard conditionally checks that the type of a property is not equal to undefined. 
+      if(typeof car.chargeVoltage !== 'undefined'){ 
         console.log(`${car.make} ${car.model} ${car.year} ${car.chargeVoltage}`)
       }else{
-        console.log(`${car.make} ${car.model} ${car.year}`)
+        console.log(`${car.make} ${car.model} ${car.year} missing voltage`)
       }
   }
 
   printCar2({make: 'Audi', model: 'R8', year: 2012})
   printCar2({make: 'Audi', model: 'R8', year: 2012, chargeVoltage: 20})
+
+  // TS also checks for excess properties, this error is identifiable by the message 'Object literal may only specify known properties'. This happens because while 
+  // this excess property does not break the code within the function it wasnt asked for within the parameter types, and it wouldnt be accessible from anywhere outside 
+  // the function, making it a useless property.
+
+  printCar2({make: 'Audi', model: 'R8', year: 2012, chargeVoltage: 21, color: 'red'})
+
+  // Excess properties dont always throw an error though, in instances like this where a variable containing an object with excess properties is passed into the function 
+  // it is fine, because those properties can realistically be accessed at other places within the script, meaning they are not necessarily useless.
+
+  const myCar = {
+    make: 'Audi', 
+    model: 'R8', 
+    year: 2012, 
+    chargeVoltage: 21, 
+    color: 'red'
+  }
+
+  printCar2(myCar)
+
+
+  // sometimes you need to add types to dictionaries, a dictionary is an object containing any number of arbitrary keys with those keys all being of the same type. Dictionaries 
+  // are typed using index signatures. The syntax looks like this [key: string]: {}
+
+  // example: 
+
+  const phones: {
+    [key: string]: {
+      country: string,
+      area: string,
+      number: string
+    } | undefined
+  } = {
+    home: {country: 'US', area: '+1', number: '541-745-9829'},
+    work: {country: 'US', area: '+1', number: '541-745-9829'},
+    cell: {country: 'US', area: '+1', number: 6},
+  }
+
+ 
+
+
 
 
 
