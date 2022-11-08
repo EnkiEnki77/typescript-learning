@@ -158,7 +158,109 @@ export default function Home() {
     cell: {country: 'US', area: '+1', number: 6},
   }
 
+//  When it comes to typing arrays, the syntax is type of array members followed by []. You can generally let TS infer the type of arrays, unless its an empty array. 
+// Then annotations should be utilized.  
+
+// inferred as string[]
+const stringArr = ['1', '2', '3']
+
+// inferred as {country: 'US', area: '+1', number: '541-745-9829'}[]
+const objArr = [{country: 'US', area: '+1', number: '541-745-9829'}, {country: 'US', area: '+1', number: '541-745-9829'}]
+
+// inferred as any[]
+const anyArr = []
+
+// So annotate it like this
+const anyArr2: string[] = []
+
+
+// Sometimes we want to work with multi element data structures, where the order has some kind of meaning. THese kinds of arrays are called tuples. 
+
+let myCarTuple = [2002, 'Audi', 'R8']
+
+// Theyre really nice for destructured assignment. 
+const [year, make, model] = myCarTuple
+
+// Inference is not our friend with tuples though, because tuple members can be of multiple different types the restraints arent as tight as may be desired. 
+// As well as the fact there's nothing keeping someone from adding additional elements or putting things at the wrong index, this would make it to where its not
+// a tuple, the tuple above is inferred as (string | number)[]. So tuples should always be annotated, like this:
+
+let myCarTuple2:[number, string, string] = [2002, 'Audi', 'R8']
+
+// Something to watch out for, you get the type restraints youd expect on assignment with tuples, but there's nothing stopping you from pushing additional
+// elements into the tuple without consequence. 
+
+
+// Sorting type systems as either static or dynamic has to do with whether typechecking is done at either compile time or run time. Some static systems are Java,
+// C#, C++, Typescript, etc.
+// While in most static type systems types must be explicitly defined every time, some such as Typescript allow for inferrence.
+// Some dynamic type systems are, Javascript, Python, Ruby, etc. 
+
+// There are also nominal vs structural type systems, nominal type systems are all about names. Whereas structural types are all about shape.   
+
+// In TS there are also intersection types (AND) and union types (OR)
+
+
+// When it comes to union types you should always use type guards to define what the output is going to be. Without narrowing, you will only be able
+// to utilize the common behavior of the two types. 
+
+function flipCoin(): "heads" | "tails" {
+  if (Math.random() > 0.5) return "heads"
+  return "tails"
+}
  
+function maybeGetUserInfo():
+  | ["error", Error]
+  | ["success", { name: string; email: string }] {
+  if (flipCoin() === "heads") {
+    return [
+      "success",
+      { name: "Mike North", email: "mike@example.com" },
+    ]
+  } else {
+    return [
+      "error",
+      new Error("The coin landed on TAILS :("),
+    ]
+  }
+}
+ 
+const outcome = maybeGetUserInfo()
+
+const [first, second] = outcome
+
+// Both possible values will be strings, so destructured variable has access to every method possible for strings
+console.log(first)
+
+// Both possible values are objects, but have different properties, so only the shared property of name is available to access.
+console.log(second)
+
+// If youre just looking to narrow between two object types you can utilize an instanceof in the conditional
+
+if(second instanceof Error){
+  //Type of Error
+  second
+}else{
+  // type of {name: string, email: string;}
+  second
+}
+
+// Tuples are beneficial to use with a type of typeguard called a discriminated union, say you have two tuples within a union that contain different objects at [1]. You can 
+// add a string literal to each tuple, and use them in a typeguard conditional in order to discriminate between the different tuples. TS knows that if the [0] index of the 
+// tuple is strict equal to one specific string literal that means it's the tuple that contains that literal, and couldnt possibly be the other. Discrinated unions are
+// also possible with objects not just tuples.
+
+if(outcome[0] === 'error'){
+  //Type of Error
+  outcome
+}else{
+  // type of {name: string, email: string;}
+  outcome
+}
+
+
+
+
 
 
 
